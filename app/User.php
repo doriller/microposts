@@ -46,10 +46,84 @@ class User extends Authenticatable
     }
 
     /**
+     * このユーザがフォロー中のユーザ (Userモデルとの関係を定義)
+     */
+    public function followings()
+    {
+        return $this->belongsToMany(User::class, 'user_follow', 'user_id', 'follow_id')->withTimestamps();
+    }
+
+    /**
+     * このユーザをフォロー中のユーザ (Userモデルとの関係を定義)
+     */
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'user_follow', 'follow_id', 'user_id')->withTimestamps();
+    }
+
+    /**
      * このユーザに関係するモデルの件数をロードする
      */
     public function loadRelationshipCounts()
     {
-        $this->loadCount('microposts');
+        $this->loadCount(['microposts', 'followings', 'followers']);
+    }
+
+    /**
+     * $userIdで指定されたユーザをフォローする
+     * 
+     * @param  int $userId
+     * @return bool
+     */
+    public function follow($userId)
+    {
+        // 既にフォローしているか確認
+        $exist = $this->is_following($userId);
+        // 対象が自分自身かどうか確認
+        $its_me = $this->id == $userId;
+
+        if ($exist || $its_me) {
+            // フォロー済み、または、自分自身の場合は何もしない
+             return false;
+        } else {
+            // 上記以外はフォローする
+            $this->followings()->attach($userId);
+            return true;
+        }
+    }
+
+    /**
+     * $userIdで指定されたユーザをアンフォローする
+     * 
+     * @param  int $userId
+     * @return bool
+     */
+    public function unfollow($userId)
+    {
+        // 既にフォローしているか確認
+        $exist = $this->is_following($userId);
+        // 対象が自分自身かどうか確認
+        $its_me = $this->id == $userId;
+
+        if ($exist && !$its_me) {
+            // フォロ済み、かつ、自分自身ではない場合はフォローを外す
+            $this->followings()->detach($userId);
+            return true;
+        } else {
+            // 上記以外は何もしない
+            return false;
+        }
+    }
+
+    /**
+     * 指定された$userIdのユーザをこのユーザがフォロー中であるか調べる。
+     * 
+     * @param  int $userId
+     * @return bool
+     */
+    public function is_following($userId)
+    {
+        // フォロー中ユーザの中に$userIdが存在するか確認
+        return $this->followings()->where('follow_id', $userId)->exists();
     }
 }
