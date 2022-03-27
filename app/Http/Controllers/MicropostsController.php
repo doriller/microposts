@@ -54,4 +54,31 @@ class MicropostsController extends Controller
         // 前のURLへリダイレクト
         return back();
     }
+
+    public function favoriteList()
+    {
+        $data = [];
+        if (\Auth::check()) {
+            // 認証済みユーザを取得
+            $user = \Auth::user();
+            // ユーザのお気に入り投稿を取得
+            //$microposts = $user->favorite_microposts()->orderBy('created_at', 'desc')->paginate(10);
+            $ins = new \App\Micropost;
+            $microposts = $ins
+                            ->join('favorites', 'microposts.id', '=', 'favorites.micropost_id')
+                            ->select('microposts.*')
+                            ->where('favorites.user_id', $user->id)
+                            //->get()
+                            ->orderBy('created_at', 'desc')
+                            ->paginate(10);
+            //dd($user->id);
+            $data = [
+                'user'       => $user,
+                'microposts' => $microposts,
+            ];
+
+            // favorite_listビューで表示
+            return view('users.favorite_list', $data);
+        }
+    }
 }

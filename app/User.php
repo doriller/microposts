@@ -200,4 +200,19 @@ class User extends Authenticatable
     {
         return $this->favorites()->where('micropost_id', $micropostId)->exists();
     }
+
+    /**
+     * このユーザがお気に入りの投稿に絞り込む
+     */
+    public function favorite_microposts()
+    {
+        /*// このユーザのお気に入り投稿を取得
+        $microposts = $this->favorites()->able('microposts')
+                            ->join('favorites', 'microposts.id', '=', 'favorites.micropost_id')
+                            ->select('microposts.*')
+                            ->where('favorites.user_id', 1)
+                            ->get();
+
+        return $microposts;*/
+    }
 }
