@@ -18,7 +18,7 @@
                         <ul class="dropdown-menu dropdown-menu-right">
                             {{-- ユーザ詳細ページへのリンク --}}
                             <li class="dropdown-item">{!! link_to_route('users.show', 'My profile', ['user' => Auth::id()]) !!}</li>
-                            <li class="dropdown-item">{!! link_to_route('microposts.favoriteList', 'Favorites', ['user' => Auth::id()]) !!}</li>
+                            <li class="dropdown-item"><a href="{{ route('microposts.favoriteList', ['id' => Auth::user()->id]) }}">Favorites</a></li>
                             <li class="dropdown-divider"></li>
                             {{-- ログアウトへのリンク --}}
                             <li class="dropdown-item">{!! link_to_route('logout.get', 'Logout') !!}</li>

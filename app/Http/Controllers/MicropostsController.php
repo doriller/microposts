@@ -54,13 +54,13 @@ class MicropostsController extends Controller
         // 前のURLへリダイレクト
         return back();
     }
-
-    public function favoriteList()
+    
+    public function favoriteList($id)
     {
         $data = [];
         if (\Auth::check()) {
-            // 認証済みユーザを取得
-            $user = \Auth::user();
+            // idの値でユーザを検索して取得
+            $user = \App\User::findOrFail($id);
             
             // 関係するモデルの件数をロード
             $user->loadRelationshipCounts();
@@ -71,7 +71,7 @@ class MicropostsController extends Controller
             $microposts = $ins
                             ->join('favorites', 'microposts.id', '=', 'favorites.micropost_id')
                             ->select('microposts.*')
-                            ->where('favorites.user_id', $user->id)
+                            ->where('favorites.user_id', $id)
                             //->get()
                             ->orderBy('created_at', 'desc')
                             ->paginate(10);
