@@ -61,6 +61,10 @@ class MicropostsController extends Controller
         if (\Auth::check()) {
             // 認証済みユーザを取得
             $user = \Auth::user();
+            
+            // 関係するモデルの件数をロード
+            $user->loadRelationshipCounts();
+            
             // ユーザのお気に入り投稿を取得
             //$microposts = $user->favorite_microposts()->orderBy('created_at', 'desc')->paginate(10);
             $ins = new \App\Micropost;
